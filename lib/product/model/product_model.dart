@@ -1,10 +1,10 @@
-
 class Product {
   String? id;
   String? name;
   String? description;
   num? price;
   String? category;
+  num? discountAmount; // Add this field
   num? version;
 
   Product({
@@ -13,6 +13,7 @@ class Product {
     this.description,
     this.price,
     this.category,
+    this.discountAmount, // Include in the constructor
     this.version,
   });
 
@@ -22,6 +23,7 @@ class Product {
     description: json['description'],
     price: json['price'],
     category: json['category'],
+    discountAmount: json['discountAmount'], // Parse from JSON
     version: json['__v'],
   );
 
@@ -31,6 +33,7 @@ class Product {
     'description': description,
     'price': price,
     'category': category,
+    'discountAmount': discountAmount, // Add to JSON
     '__v': version,
   };
 }

@@ -1,98 +1,112 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:snap_kart_admin/core/app_constant.dart';
-import 'package:snap_kart_admin/product/model/product_model.dart';
 import 'package:snap_kart_admin/service/api_endpoint.dart';
 import 'package:snap_kart_admin/service/storage_service.dart';
+import '../model/add_product_model.dart';
+
 
 class ProductService {
-  Future<List<Product>> fetchProducts() async {
-    String url = ApiEndpoint.addProduct;
-
-    final response = await http.get(
-      Uri.parse(url),
-      headers: {'x-api-key': 'aihfj--qwnkqwr--jlkqwnjqw--jnkqwjnqwy'},
-    );
-
+  Future<List<ProductModel>> fetchProducts() async {
+    String url = ApiEndpoint.getProduct;
+    final response = await http
+        .get(Uri.parse(url), headers: {'x-api-key':  AppConstant.apikey});
     if (response.statusCode == 200) {
-      try {
-        final List<dynamic> mapList = jsonDecode(response.body);
-
-        if (mapList.isEmpty) {
-          return [];
-        }
-
-        return mapList
-            .map((map) => Product.fromJson(map as Map<String, dynamic>))
-            .toList();
-      } catch (e) {
-        throw 'Error parsing product data: $e';
+      final maplist = jsonDecode(response.body);
+      List<ProductModel> productList = [];
+      for (int a = 0; a < maplist.length; a++) {
+        final map = maplist[a];
+        ProductModel product = ProductModel.fromJson(map);
+        productList.add(product);
       }
+      return productList;
     } else {
-      throw 'Unable to fetch products. Status code: ${response.statusCode}';
+      throw 'Unavailable product';
     }
   }
 
-  Future<bool> addProduct(Product product) async {
+  Future<bool> addProduct(ProductModel product) async {
+    String? token = await StorageHelper.getToken();
+    final header = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+      'x-api-key':  AppConstant.apikey
+    };
+    String url = ApiEndpoint.addProduct;
+    Uri uri = Uri.parse(url);
+    final map = product.toJson();
+    String jsonProduct = jsonEncode(map);
+    final response = await http.post(uri, body: jsonProduct, headers: header);
+    if (response.statusCode == 201) {
+      return true;
+    } else {
+      print(token);
+      throw 'Note Fount${response.statusCode}';
+    }
+  }
+
+  Future<bool> deleteProduct(String id) async {
+    String? token = await StorageHelper.getToken();
+    final header = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+      'x-api-key':  AppConstant.apikey,
+    };
+    String url =
+    ApiEndpoint.deleteProduct(id);
+    Uri uri = Uri.parse(url);
+
     try {
-      String url = ApiEndpoint.addProduct;
-      Uri uri = Uri.parse(url);
+      final response = await http.delete(uri, headers: header);
 
-      String? token = await StorageHelper.getToken();
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        throw 'Failed to delete product: ${response.statusCode}';
+      }
+    } catch (e) {
+      throw 'Error deleting product: $e';
+    }
+  }
 
-      if (token == null) {}
+  Future<bool> updateProducs(ProductModel updatedProduct) async {
+    String? token = await StorageHelper.getToken();
+    if (token == null || token.isEmpty) {
+      throw 'Authentication token is missing.';
+    }
 
-      final headers = {
-        'x-api-key': AppConstant.apikey,
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      };
+    final headers = {
+      'Content-Type': 'application/json',
+     // 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjczNWEwYjAyZTI3OTJhNmI2MDMwOWI2IiwidXNlcm5hbWUiOiJ0ZXN0dXNlciJ9LCJpYXQiOjE3MzI5ODE5NDAsImV4cCI6MTczMjk4NTU0MH0.ab8yqs_0A7ek13ra6jWWXhZVs8BJzFwum5JHE94WK2M',
+      'x-api-key': AppConstant.apikey,
+      'Authorization': 'Bearer $token',
+    };
 
-      final body = jsonEncode(product.toJson());
-      final response = await http.post(
+    String url = ApiEndpoint.updateProduct(updatedProduct.id!);
+    Uri uri = Uri.parse(url);
+
+    final body = updatedProduct.toJson();
+
+    try {
+      final response = await http.put(
         uri,
         headers: headers,
-        body: body,
+        body: jsonEncode(body),
       );
 
-      if (response.statusCode == 201) {
+      print('Response Status: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
         return true;
+      } else if (response.statusCode == 401) {
+        throw 'Invalid or expired token.';
       } else {
-        print(
-            'Failed to add product: ${response.statusCode} - ${response.body}');
-        return false;
+        throw 'Failed to update product: ${response.body}';
       }
     } catch (e) {
-      print('Error in ProductService.addProduct: $e');
-      return false;
+      throw 'Error updating product: $e';
     }
   }
 
-  Future<bool> deleteProduct(String productId) async {
-    try {
-      String url = '${ApiEndpoint.deleteProduct}/$productId';
-      Uri uri = Uri.parse(url);
-
-      String? token = await StorageHelper.getToken();
-
-      final headers = {
-        'x-api-key': AppConstant.apikey,
-        'Authorization': 'Bearer $token',
-      };
-
-      final response = await http.delete(uri, headers: headers);
-
-      if (response.statusCode == 200 || response.statusCode == 204) {
-        print('Product deleted successfully');
-        return true;
-      } else {
-        print(
-            'Failed to delete product:${response.body}');
-        return false;
-      }
-    } catch (e) {
-      print('Error in ProductService.deleteProduct: $e');
-      return false;
-    }
-  }
 }

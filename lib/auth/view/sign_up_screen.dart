@@ -94,7 +94,7 @@ class SignUpScreen extends StatelessWidget {
                               : () async {
                             if (formKey.currentState!.validate()) {
                               final user = UserModel(
-                                username: nameController.text.trim(),
+                                email: nameController.text.trim(),
                                 password: passwordController.text.trim(),
                               );
                               await authProvider.signUpUser(user);

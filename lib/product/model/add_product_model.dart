@@ -1,36 +1,57 @@
-class AddProduct {
+class ProductModel {
+  String id;
   String? name;
+  num? price;
+  String? image;
   String? description;
-  int? price;
-  String? category;
-  String? sId;
-  int? iV;
+  num? discountAmount;
+  String? categoryId;
+  num? stock;
+  num? created;
+  num? modified;
 
-  AddProduct(
-      {this.name,
-        this.description,
-        this.price,
-        this.category,
-        this.sId,
-        this.iV});
+  ProductModel({
+    required this.id,
+    this.name,
+    this.price,
+    this.image,
+    this.description,
+    this.discountAmount,
+    this.categoryId,
+    this.stock,
+    this.created,
+    this.modified,
+  });
 
-  AddProduct.fromJson(Map<String, dynamic> json) {
-    name = json['name'];
-    description = json['description'];
-    price = json['price'];
-    category = json['category'];
-    sId = json['_id'];
-    iV = json['__v'];
+
+  factory ProductModel.fromJson(Map<String, dynamic> json) {
+    return ProductModel(
+      id: json['_id'],
+      name: json['name'],
+      price: json['price'],
+      image: json['image'],
+      description: json['description'],
+      discountAmount: json['discountAmount'],
+      categoryId: json['categoryId'],
+      stock: json['stock'],
+      created: json['created'],
+      modified: json['modified'],
+    );
   }
 
+
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['name'] = this.name;
-    data['description'] = this.description;
-    data['price'] = this.price;
-    data['category'] = this.category;
-    data['_id'] = this.sId;
-    data['__v'] = this.iV;
-    return data;
+    return {
+      '_id': id,
+      'name': name,
+      'price': price,
+      'image': image,
+      'description': description,
+      'discountAmount': discountAmount,
+      'categoryId': categoryId,
+      'stock': stock,
+      'created': created,
+      'modified': modified,
+    };
   }
 }

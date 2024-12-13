@@ -5,7 +5,6 @@ import 'package:snap_kart_admin/category/category_screen_.dart';
 import 'package:snap_kart_admin/product/view/product_screen.dart';
 import 'package:snap_kart_admin/profile/view/profile_screen.dart';
 
-
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
@@ -23,7 +22,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     const ProfileScreen(),
   ];
 
-
   void onItemTapped(int index) {
     setState(() {
       selectedIndex = index;
@@ -32,7 +30,114 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        double maxWidth = constraints.maxWidth;
+
+        if (maxWidth >= 1200) {
+          return _buildDesktopLayout();
+        } else if (maxWidth >= 600) {
+          return _buildTabletLayout();
+        } else {
+          return _buildPhoneLayout();
+        }
+      },
+    );
+  }
+
+  Widget _buildDesktopLayout() {
     return Scaffold(
+
+      body: Row(
+        children: [
+          NavigationRail(
+            selectedIndex: selectedIndex,
+            onDestinationSelected: onItemTapped,
+            labelType: NavigationRailLabelType.all,
+            destinations: const [
+              NavigationRailDestination(
+                icon: Icon(Icons.shopping_bag),
+                selectedIcon: Icon(Icons.shopping_bag, color: Colors.blueGrey),
+                label: Text('Products'),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.category),
+                selectedIcon: Icon(Icons.category, color: Colors.blueGrey),
+                label: Text('Categories'),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.shopping_cart),
+                selectedIcon: Icon(Icons.shopping_cart, color: Colors.blueGrey),
+                label: Text('Cart'),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.person),
+                selectedIcon: Icon(Icons.person, color: Colors.blueGrey),
+                label: Text('Profile'),
+              ),
+            ],
+            selectedIconTheme: const IconThemeData(color: Colors.blueGrey),
+            unselectedIconTheme: const IconThemeData(color: Colors.grey),
+          ),
+          Expanded(
+            child: IndexedStack(
+              index: selectedIndex,
+              children: _screens,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTabletLayout() {
+    return Scaffold(
+
+      body: Row(
+        children: [
+          NavigationRail(
+            selectedIndex: selectedIndex,
+            onDestinationSelected: onItemTapped,
+            labelType: NavigationRailLabelType.selected,
+            destinations: const [
+              NavigationRailDestination(
+                icon: Icon(Icons.shopping_bag),
+                selectedIcon: Icon(Icons.shopping_bag, color: Colors.blueGrey),
+                label: Text('Products'),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.category),
+                selectedIcon: Icon(Icons.category, color: Colors.blueGrey),
+                label: Text('Categories'),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.shopping_cart),
+                selectedIcon: Icon(Icons.shopping_cart, color: Colors.blueGrey),
+                label: Text('Cart'),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.person),
+                selectedIcon: Icon(Icons.person, color: Colors.blueGrey),
+                label: Text('Profile'),
+              ),
+            ],
+            selectedIconTheme: const IconThemeData(color: Colors.blueGrey),
+            unselectedIconTheme: const IconThemeData(color: Colors.grey),
+          ),
+          Expanded(
+            child: IndexedStack(
+              index: selectedIndex,
+              children: _screens,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPhoneLayout() {
+    return Scaffold(
+
       body: IndexedStack(
         index: selectedIndex,
         children: _screens,
@@ -58,8 +163,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             label: 'Profile',
           ),
         ],
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey[700],
+        selectedItemColor: Colors.blueGrey,
+        unselectedItemColor: Colors.grey[800],
       ),
     );
   }

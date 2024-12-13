@@ -1,69 +1,125 @@
-import 'package:flutter/cupertino.dart';
-import 'package:snap_kart_admin/product/model/product_model.dart';
+
+import 'package:flutter/foundation.dart';
+import 'package:snap_kart_admin/product/model/add_product_model.dart';
 import 'package:snap_kart_admin/product/service/product_service.dart';
 import 'package:snap_kart_admin/service/app_util.dart';
 
+
+
 class ProductProvider extends ChangeNotifier {
-  List<Product> productList = [];
+  List<ProductModel> productList = [];
   ProductService productService;
   String? errorMessage;
-  bool isLoading = false;
 
   ProductProvider(this.productService);
 
-  Future<void> fetchProducts() async {
-    if (isLoading) return;
-
-    isLoading = true;
-    notifyListeners();
-
+  Future fetchProduct() async {
     try {
       productList = await productService.fetchProducts();
-      errorMessage = null;
+      notifyListeners();
     } catch (e) {
       errorMessage = e.toString();
-      productList = [];
-    } finally {
-      isLoading = false;
       notifyListeners();
     }
   }
 
-  Future<void> addProduct(Product product) async {
+  Future addProduct(ProductModel product) async {
     try {
-      errorMessage = null;
       bool success = await productService.addProduct(product);
       if (success) {
-        AppUtil.showToast('Product added successfully');
-        productList.add(product); // Update local list if needed
         notifyListeners();
-      } else {
-        AppUtil.showToast('Failed to add product!');
+        AppUtil.showToast('Product Add Successfully');
       }
     } catch (e) {
-      errorMessage = e.toString();
-      AppUtil.showToast(errorMessage!);
-    } finally {
       notifyListeners();
+      AppUtil.showToast(e.toString());
     }
   }
 
-  Future<void> deleteProduct(String productId) async {
+  Future deleteProduct(String productId) async {
+    errorMessage = null;
     try {
-      errorMessage = null;
       bool success = await productService.deleteProduct(productId);
       if (success) {
         productList.removeWhere((product) => product.id == productId);
-        AppUtil.showToast('Product deleted successfully');
         notifyListeners();
+        AppUtil.showToast('Product deleted successfully');
+        return true;
       } else {
-        AppUtil.showToast('Failed to delete product!');
+        errorMessage = 'Failed to delete product';
+        notifyListeners();
+        return false;
       }
     } catch (e) {
       errorMessage = e.toString();
-      AppUtil.showToast(errorMessage!);
-    } finally {
       notifyListeners();
+      AppUtil.showToast(e.toString());
+      return false;
     }
   }
+
+
+  // Future<bool> updateProduct(ProductModel updatedProduct) async {
+  //   errorMessage = null;
+  //   try {
+  //     bool success = await productService.updateProducs(updatedProduct);
+  //
+  //     if (success) {
+  //       productList.removeWhere((product) => product.id == updatedProduct.id);
+  //
+  //       productList.add(updatedProduct);
+  //
+  //       notifyListeners();
+  //       AppUtil.showToast('Product updated successfully');
+  //       return true;
+  //     } else {
+  //       errorMessage = 'Failed to update product';
+  //       notifyListeners();
+  //       AppUtil.showToast(errorMessage!);
+  //       return false;
+  //     }
+  //   } catch (e) {
+  //     errorMessage = e.toString();
+  //     notifyListeners();
+  //     AppUtil.showToast(e.toString());
+  //     return false;
+  //   }
+  // }
+
+  Future<bool> updateProduct(ProductModel updatedProduct) async {
+    errorMessage = null;
+    try {
+      bool success = await productService.updateProducs(updatedProduct);
+
+      if (success) {
+        int index = productList.indexWhere((product) => product.id == updatedProduct.id);
+        if (index != -1) {
+          productList[index] = updatedProduct;
+        }
+
+        notifyListeners();
+        AppUtil.showToast('Product updated successfully');
+        return true;
+      } else {
+        errorMessage = 'Failed to update product';
+        notifyListeners();
+        AppUtil.showToast(errorMessage!);
+        return false;
+      }
+    } catch (e) {
+      errorMessage = e.toString();
+      notifyListeners();
+      AppUtil.showToast(e.toString());
+      return false;
+    }
+  }
+
+
+
+  void updateProductImage(int index, String imagePath) {
+    productList[index].image = imagePath;
+    notifyListeners();
+  }
+
 }
+

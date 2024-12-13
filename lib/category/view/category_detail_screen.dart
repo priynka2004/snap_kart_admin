@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:snap_kart_admin/category/model/add_category_model.dart';
-
 import '../provider/category_provider.dart';
+import '../model/add_category_model.dart';
+import 'update_category.dart';
 
 class CategoryDetailsScreen extends StatelessWidget {
-  CategoryDetailsScreen({required this.category, super.key});
+  const CategoryDetailsScreen({required this.category, super.key});
 
   final Category category;
 
@@ -13,8 +13,19 @@ class CategoryDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.orange,
-        title: const Text('Add Category'),
+        backgroundColor: Colors.blueGrey,
+        leading: GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: const Icon(
+              Icons.arrow_back_ios,
+              color: Colors.white,
+            )),
+        title: const Text(
+          'Category Details',
+          style: TextStyle(color: Colors.white),
+        ),
         actions: [
           IconButton(
             onPressed: () async {
@@ -22,13 +33,12 @@ class CategoryDetailsScreen extends StatelessWidget {
                 context: context,
                 builder: (context) {
                   return AlertDialog(
-                    title: const Text('Delete Categories'),
-                    content: const Text('Are you sure you want to delete  categories?'),
+                    title: const Text('Delete Category'),
+                    content: const Text(
+                        'Are you sure you want to delete this category?'),
                     actions: [
                       TextButton(
-                        onPressed: (
-
-                            ) => Navigator.pop(context, false),
+                        onPressed: () => Navigator.pop(context, false),
                         child: const Text('Cancel'),
                       ),
                       TextButton(
@@ -41,51 +51,87 @@ class CategoryDetailsScreen extends StatelessWidget {
               );
 
               if (shouldDelete ?? false) {
-                final categoryProvider =
-                Provider.of<CategoryProvider>(context, listen: false);
+                final provider =
+                    Provider.of<CategoryProvider>(context, listen: false);
+
                 try {
-                  await categoryProvider.deleteAllCategories();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text(' categories deleted successfully')),
-                  );
+                  await provider.deleteCategory(category.sId!);
+
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Category deleted successfully!'),
+                        backgroundColor: Colors.black,
+                      ),
+                    );
+                    Navigator.pop(context);
+                  }
                 } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(' delete categories: $e')),
-                  );
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Failed to delete category: $e'),
+                        backgroundColor: Colors.black,
+                      ),
+                    );
+                  }
                 }
               }
             },
-            icon: const Icon(Icons.delete),
+            icon: const Icon(
+              Icons.delete,
+              color: Colors.white,
+            ),
+          ),
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => UpdateCategory(
+                    categoryId: category.sId!,
+                    currentName: category.name!,
+                    currentDescription: category.iV.toString(),
+                  ),
+                ),
+              );
+            },
+            icon: const Icon(
+              Icons.update,
+              color: Colors.white,
+            ),
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(18.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Card(
-                child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                'CategoryName: ${category.name}',
-                style: TextStyle(fontWeight: FontWeight.bold),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Category Name ',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  Text(
+                    category.name!,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                ],
               ),
-            )),
-            Card(
-                child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text('CategorysId:   ${category.sId}',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-            )),
-            Card(
-                child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text('CategoryIv:   ${category.iV}',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-            )),
-          ],
-        ),
+            ),
+          ),
+        ],
       ),
     );
   }

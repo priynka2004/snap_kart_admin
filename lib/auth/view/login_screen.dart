@@ -7,28 +7,34 @@ import 'package:snap_kart_admin/dashboard/view/dashboard_screen.dart';
 import 'package:snap_kart_admin/service/app_util.dart';
 
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   LoginScreen({super.key});
 
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
   final TextEditingController emailController = TextEditingController();
+
   final TextEditingController passwordController = TextEditingController();
 
   Future<void> login(BuildContext context) async {
     if (formKey.currentState!.validate()) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       UserModel user = UserModel(
-        username: emailController.text.trim(),
+        email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
-
       await authProvider.login(user);
 
       if (authProvider.errorMessage == null) {
         AppUtil.showToast("Login Successful!");
 
         Navigator.pushReplacement(context, MaterialPageRoute(builder:(context){
-          return DashboardScreen();
+          return const DashboardScreen();
         }));
       } else {
         AppUtil.showToast(authProvider.errorMessage!);
@@ -69,7 +75,7 @@ class LoginScreen extends StatelessWidget {
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: Colors.white,
-                      hintText: "Username",
+                      hintText: "email",
                       prefixIcon: const Icon(Icons.account_circle, color: Colors.black),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),

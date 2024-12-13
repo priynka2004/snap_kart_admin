@@ -62,10 +62,9 @@ class AuthService {
      await prefs.clear();
 
 
- // Get.offAllNamed('/login');
   }
    Future<void> _simulateNetworkDelay() async {
-     await Future.delayed(Duration(seconds: 2));
+     await Future.delayed(const Duration(seconds: 2));
    }
 
 }

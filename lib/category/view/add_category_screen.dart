@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../model/add_category_model.dart';
+import 'package:snap_kart_admin/service/app_util.dart';
 import '../provider/category_provider.dart';
+import '../model/add_category_model.dart';
+
 
 class AddCategoryScreen extends StatefulWidget {
   const AddCategoryScreen({super.key});
@@ -12,13 +14,34 @@ class AddCategoryScreen extends StatefulWidget {
 
 class _AddCategoryScreenState extends State<AddCategoryScreen> {
   final nameController = TextEditingController();
+  Category? category;
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final categoryProvider =
+    Provider.of<CategoryProvider>(context, listen: false);
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.orange,
-        title: const Text('Add Category'),
+        backgroundColor: Colors.blueGrey,
+        leading: GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: const Icon(
+              Icons.arrow_back_ios,
+              color: Colors.white,
+            )),
+        title: const Text(
+          'Add Category',
+          style: TextStyle(color: Colors.white),
+        ),
         actions: [
           IconButton(
             onPressed: () async {
@@ -27,7 +50,8 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                 builder: (context) {
                   return AlertDialog(
                     title: const Text('Delete All Categories'),
-                    content: const Text('Are you sure you want to delete all categories?'),
+                    content: const Text(
+                        'Are you sure you want to delete all categories?'),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(context, false),
@@ -43,71 +67,73 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
               );
 
               if (shouldDelete ?? false) {
-                final categoryProvider =
-                Provider.of<CategoryProvider>(context, listen: false);
-                try {
-                  await categoryProvider.deleteAllCategories();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('All categories deleted successfully')),
-                  );
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Failed to delete categories: $e')),
-                  );
-                }
+                await categoryProvider.deleteCategory(category!.sId!);
+                AppUtil.showToast('All categories deleted successfully');
               }
             },
-            icon: const Icon(Icons.delete),
-          ),
-        ],
-      ),
-
-      body: getBody(),
-    );
-  }
-
-  Widget getBody() {
-    return Padding(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        children: [
-          mainTextFormField(nameController, 'Category Name'),
-          SizedBox(
-            height: 20,
-          ),
-          Center(
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(),
-              onPressed: addCategoryButton,
-              child: Text(
-                'Add  Category',
-                style: TextStyle(color: Colors.black),
-              ),
+            icon: const Icon(
+              Icons.delete,
+              color: Colors.white,
             ),
           ),
         ],
       ),
-    );
-  }
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            const Padding(
+              padding: EdgeInsets.only(right: 200),
+              child: Text(
+                'Category Name:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: nameController,
+              decoration: InputDecoration(
+                hintText: 'Enter category name',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+            const Spacer(),
+            ElevatedButton(
+              onPressed: () async {
+                final categoryName = nameController.text.trim();
+                if (categoryName.isEmpty) {
+                  AppUtil.showToast('Category name cannot be empty');
+                  return;
+                }
 
-  void addCategoryButton() async {
-    String name = nameController.text;
-    CategoryProvider provider =
-        Provider.of<CategoryProvider>(context, listen: false);
-    Category category = Category(
-      name: name,
-    );
-    await provider.addCategory(category);
-    Navigator.pop(context);
-  }
-
-  Widget mainTextFormField(controller, hintText) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: TextField(
-        controller: controller,
-        decoration: InputDecoration(
-          hintText: hintText,
+                try {
+                  await categoryProvider.addCategory(
+                    Category(name: categoryName),
+                  );
+                  nameController.clear();
+                  AppUtil.showToast('Category added successfully');
+                  Navigator.pop(context);
+                } catch (e) {
+                  AppUtil.showToast('Failed to add category: $e');
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: Colors.blueGrey,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 120),
+                elevation: 3,
+              ),
+              child: const Text(
+                'Add Category',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
         ),
       ),
     );
