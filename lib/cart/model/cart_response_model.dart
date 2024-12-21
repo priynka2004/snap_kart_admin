@@ -7,7 +7,7 @@ import 'package:snap_kart_admin/cart/model/cart_item_model.dart';
 class CartResponse {
   String? user;
   int? subtotal;
-  int? totalDiscount;
+  num? totalDiscount;
   List<CartItem>? items;
 
   CartResponse({this.user, this.subtotal, this.totalDiscount, this.items});

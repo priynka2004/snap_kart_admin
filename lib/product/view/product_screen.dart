@@ -1,14 +1,12 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:snap_kart_admin/product/view/product_details_screen.dart';
+import 'package:snap_kart_admin/product/view/add_product_screen.dart';  // Import AddProductScreen
 
 import '../provider/product_provider.dart';
-
 
 class ProductScreen extends StatefulWidget {
   const ProductScreen({super.key});
@@ -23,14 +21,12 @@ class _ProductScreenState extends State<ProductScreen> {
 
   Future<void> fetchProduct() async {
     final productProvider =
-        Provider.of<ProductProvider>(context, listen: false);
+    Provider.of<ProductProvider>(context, listen: false);
     await productProvider.fetchProduct();
   }
 
   Future<void> _pickImage(int index) async {
-
     if (kIsWeb) {
-
       showModalBottomSheet(
         context: context,
         builder: (context) {
@@ -42,7 +38,7 @@ class _ProductScreenState extends State<ProductScreen> {
                 title: const Text('Choose from Gallery'),
                 onTap: () async {
                   final XFile? pickedFile =
-                      await _picker.pickImage(source: ImageSource.gallery);
+                  await _picker.pickImage(source: ImageSource.gallery);
                   if (pickedFile != null) {
                     setState(() {
                       Provider.of<ProductProvider>(context, listen: false)
@@ -68,7 +64,7 @@ class _ProductScreenState extends State<ProductScreen> {
                 title: const Text('Take a photo'),
                 onTap: () async {
                   final XFile? pickedFile =
-                      await _picker.pickImage(source: ImageSource.camera);
+                  await _picker.pickImage(source: ImageSource.camera);
                   if (pickedFile != null) {
                     setState(() {
                       Provider.of<ProductProvider>(context, listen: false)
@@ -83,7 +79,7 @@ class _ProductScreenState extends State<ProductScreen> {
                 title: const Text('Choose from Gallery'),
                 onTap: () async {
                   final XFile? pickedFile =
-                      await _picker.pickImage(source: ImageSource.gallery);
+                  await _picker.pickImage(source: ImageSource.gallery);
                   if (pickedFile != null) {
                     setState(() {
                       Provider.of<ProductProvider>(context, listen: false)
@@ -130,21 +126,17 @@ class _ProductScreenState extends State<ProductScreen> {
           )
         ],
       ),
-
-      body:
-          Consumer<ProductProvider>(builder: (context, productProvider, child) {
+      body: Consumer<ProductProvider>(builder: (context, productProvider, child) {
         if (productProvider.productList.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
 
         return LayoutBuilder(
           builder: (context, constraints) {
-
             if (constraints.maxWidth > 600) {
               return Expanded(
                 child: GridView.builder(
-                  gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 10,
@@ -178,7 +170,7 @@ class _ProductScreenState extends State<ProductScreen> {
                               padding: const EdgeInsets.all(8.0),
                               child: Text(
                                 product.name ?? "Unnamed Product",
-                                maxLines: 1,
+                                maxLines: 4,
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
@@ -201,8 +193,8 @@ class _ProductScreenState extends State<ProductScreen> {
                   final product = productProvider.productList[index];
                   return Card(
                     shadowColor: Colors.black,
-                    margin:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 4),
                     child: ListTile(
                       onTap: () {
                         Navigator.push(
@@ -219,7 +211,7 @@ class _ProductScreenState extends State<ProductScreen> {
                           backgroundImage: product.image?.isNotEmpty == true
                               ? NetworkImage(product.image!)
                               : const NetworkImage(
-                                  'https://example.com/default-image.jpg'),
+                              'https://example.com/default-image.jpg'),
                           radius: 30,
                         ),
                       ),
@@ -243,6 +235,18 @@ class _ProductScreenState extends State<ProductScreen> {
           },
         );
       }),
+
+      // Floating Action Button to Add Product
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AddProductScreen()), // Navigate to AddProductScreen
+          );
+        },
+        child: const Icon(Icons.add),
+        backgroundColor: Colors.blueGrey,
+      ),
     );
   }
 }

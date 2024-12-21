@@ -26,22 +26,38 @@ class ProductService {
   }
 
   Future<bool> addProduct(ProductModel product) async {
-    String? token = await StorageHelper.getToken();
-    final header = {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token',
-      'x-api-key':  AppConstant.apikey
-    };
-    String url = ApiEndpoint.addProduct;
-    Uri uri = Uri.parse(url);
-    final map = product.toJson();
-    String jsonProduct = jsonEncode(map);
-    final response = await http.post(uri, body: jsonProduct, headers: header);
-    if (response.statusCode == 201) {
-      return true;
-    } else {
-      print(token);
-      throw 'Note Fount${response.statusCode}';
+    try {
+      String? token = await StorageHelper.getToken();
+      if (token == null || token.isEmpty) {
+        print("Token is null or empty");
+        return false;
+      }
+
+
+      final header = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+        'x-api-key': AppConstant.apikey,
+      };
+
+      String url = ApiEndpoint.addProduct;
+      Uri uri = Uri.parse(url);
+      final response = await http.post(
+        uri,
+        body: jsonEncode(product.toJson()),
+        headers: header,
+      );
+
+      if (response.statusCode == 201) {
+        return true;
+      } else if (response.statusCode == 401) {
+        throw 'Unauthorized: Invalid or expired token.';
+      } else {
+        throw 'Failed with status code: ${response.statusCode}';
+      }
+    } catch (e) {
+      print('Add product failed: $e');
+      return false;
     }
   }
 

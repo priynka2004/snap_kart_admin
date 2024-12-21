@@ -23,16 +23,17 @@ class ProductProvider extends ChangeNotifier {
     }
   }
 
-  Future addProduct(ProductModel product) async {
+  Future<bool> addProduct(ProductModel product) async {
     try {
       bool success = await productService.addProduct(product);
       if (success) {
         notifyListeners();
-        AppUtil.showToast('Product Add Successfully');
+        return true; // Explicit return for success
       }
+      return false; // Explicit return for failure
     } catch (e) {
       notifyListeners();
-      AppUtil.showToast(e.toString());
+      return false; // Explicit return for failure in case of exceptions
     }
   }
 
@@ -59,32 +60,7 @@ class ProductProvider extends ChangeNotifier {
   }
 
 
-  // Future<bool> updateProduct(ProductModel updatedProduct) async {
-  //   errorMessage = null;
-  //   try {
-  //     bool success = await productService.updateProducs(updatedProduct);
-  //
-  //     if (success) {
-  //       productList.removeWhere((product) => product.id == updatedProduct.id);
-  //
-  //       productList.add(updatedProduct);
-  //
-  //       notifyListeners();
-  //       AppUtil.showToast('Product updated successfully');
-  //       return true;
-  //     } else {
-  //       errorMessage = 'Failed to update product';
-  //       notifyListeners();
-  //       AppUtil.showToast(errorMessage!);
-  //       return false;
-  //     }
-  //   } catch (e) {
-  //     errorMessage = e.toString();
-  //     notifyListeners();
-  //     AppUtil.showToast(e.toString());
-  //     return false;
-  //   }
-  // }
+
 
   Future<bool> updateProduct(ProductModel updatedProduct) async {
     errorMessage = null;

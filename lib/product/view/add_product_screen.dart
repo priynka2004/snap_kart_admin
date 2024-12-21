@@ -82,6 +82,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 140),
                 elevation: 3,
               ),
+
               onPressed: () async {
                 if (nameController.text.isEmpty ||
                     desController.text.isEmpty ||
@@ -108,30 +109,37 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   id: '',
                 );
 
-                final success = await Provider.of<ProductProvider>(context, listen: false)
-                    .addProduct(product);
+                try {
+                  final success = await Provider.of<ProductProvider>(context, listen: false)
+                      .addProduct(product);
 
-                if (success) {
-                  Fluttertoast.showToast(
-                    msg: "Product added successfully",
-                    backgroundColor: Colors.green,
-                    textColor: Colors.white,
-                  );
+                  if (success) {
+                    Fluttertoast.showToast(
+                      msg: "Product added successfully",
+                      backgroundColor: Colors.green,
+                      textColor: Colors.white,
+                    );
 
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                      builder: (context) => ProductScreen(),
-                    ),
-                        (route) => false,
-                  );
-                } else {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (context) => const ProductScreen()),
+                          (route) => false,
+                    );
+                  } else {
+                    Fluttertoast.showToast(
+                      msg: "Failed to add product",
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                    );
+                  }
+                } catch (e) {
                   Fluttertoast.showToast(
-                    msg: "Failed to add product",
+                    msg: "An error occurred: $e",
                     backgroundColor: Colors.red,
                     textColor: Colors.white,
                   );
                 }
               },
+
 
 
               child: const Text(

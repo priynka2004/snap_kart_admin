@@ -55,38 +55,36 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildCard('Name', widget.product.name),
-              _buildCard('Price', '₹${widget.product.price ?? ""}'),
-              _buildDescriptionCard('Description', widget.product.description),
-              _buildCard('Category', widget.product.categoryId),
-              _buildCard('Stock', widget.product.stock.toString()),
-              _buildCard('Discount Amount', '₹${widget.product.discountAmount ?? ""}'),
-              const SizedBox(height: 340),
-              ElevatedButton(
-                onPressed: () async {
-                  final cartModel = CartModel(
-                    productId: widget.product.id,
-                    quantity: 1,
-                  );
-                  await Provider.of<CartProvider>(context, listen: false).addToCart(cartModel);
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return const CartScreen();
-                  }));
-                  await Provider.of<CartProvider>(context, listen: false).fetchCartItems();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueGrey,
-                ),
-                child: const Center(
-                  child: Text("Add to Cart", style: TextStyle(color: Colors.white)),
-                ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildCard('Name', widget.product.name),
+            _buildCard('Price', '₹${widget.product.price ?? ""}'),
+            _buildDescriptionCard('Description', widget.product.description),
+            _buildCard('Category', widget.product.categoryId),
+            _buildCard('Stock', widget.product.stock.toString()),
+            _buildCard('Discount Amount', '₹${widget.product.discountAmount ?? ""}'),
+            const SizedBox(height: 100),
+            ElevatedButton(
+              onPressed: () async {
+                final cartModel = CartModel(
+                  productId: widget.product.id,
+                  quantity: 1,
+                );
+                await Provider.of<CartProvider>(context, listen: false).addToCart(cartModel);
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return const CartScreen();
+                }));
+                await Provider.of<CartProvider>(context, listen: false).fetchCartItems();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueGrey,
               ),
-            ],
-          ),
+              child: const Center(
+                child: Text("Add to Cart", style: TextStyle(color: Colors.white)),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -169,7 +167,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             const SizedBox(height: 8),
             Text(
               value ?? "N/A",
-              maxLines: 4,
+              maxLines: 3,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),

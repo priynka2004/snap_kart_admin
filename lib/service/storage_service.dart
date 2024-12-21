@@ -13,6 +13,7 @@ class StorageHelper {
     return sharedPreferences.getString(tokenKey);
   }
 
+
   static Future<void> clearToken() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     await sharedPreferences.remove(tokenKey);
