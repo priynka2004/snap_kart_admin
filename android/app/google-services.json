@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "312436092339",
+    "project_id": "sanp-cart",
+    "storage_bucket": "sanp-cart.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:312436092339:android:4330f488752369765eafc6",
+        "android_client_info": {
+          "package_name": "com.example.snap_kart_admin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDf7KsU-eySXh-PI09Y4c8cRkrJRvKY7kg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
